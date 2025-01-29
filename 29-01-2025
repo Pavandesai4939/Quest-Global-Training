@@ -1,0 +1,1516 @@
+1. Player Performance Tracker
+Description:
+
+Develop a system to track and analyze the performance of players in a tournament.
+Specifications:
+Structure: Stores player details (name, age, matches played, total runs/goals, average score).
+Array: Holds records of multiple players.
+Union: Stores either batting average or bowling economy (for cricket) or scoring stats (for football).
+Strings: Store player names and positions.
+const Pointers: Ensure player details cannot be modified.
+Double Pointers: Allocate memory dynamically for new players.
+
+#include <stdio.h>
+#include <string.h>
+
+union PlayerStats {
+    float battingAverage;
+    float bowlingEconomy;
+    int footballGoals;
+};
+
+struct Player {
+    char name[50];
+    int age;
+    int matchesPlayed;
+    int totalRunsOrGoals;
+    float averageScore;
+    union PlayerStats stats;
+};
+
+void displayPlayerDetails(const struct Player* player) {
+    printf("\nPlayer Name: %s\n", player->name);
+    printf("Age: %d\n", player->age);
+    printf("Matches Played: %d\n", player->matchesPlayed);
+    printf("Total Runs/Goals: %d\n", player->totalRunsOrGoals);
+    printf("Average Score: %.2f\n", player->averageScore);
+    if (player->averageScore > 0) {
+        printf("Batting Average: %.2f\n", player->stats.battingAverage);
+    } else {
+        printf("Football Goals: %d\n", player->stats.footballGoals);
+    }
+}
+
+int main() {
+    struct Player player1;
+
+    printf("Enter player name: ");
+    fgets(player1.name, sizeof(player1.name), stdin);
+    player1.name[strcspn(player1.name, "\n")] = 0;
+
+    printf("Enter player age: ");
+    scanf("%d", &player1.age);
+
+    printf("Enter matches played: ");
+    scanf("%d", &player1.matchesPlayed);
+
+    printf("Enter total runs/goals: ");
+    scanf("%d", &player1.totalRunsOrGoals);
+
+    printf("Enter average score: ");
+    scanf("%f", &player1.averageScore);
+
+    if (player1.averageScore > 0) {
+        printf("Enter batting average (for cricket): ");
+        scanf("%f", &player1.stats.battingAverage);
+    } else {
+        printf("Enter football goals scored: ");
+        scanf("%d", &player1.stats.footballGoals);
+    }
+
+    displayPlayerDetails(&player1);
+
+    return 0;
+}
+
+
+ 
+2. Sports Team Management System
+Description:
+
+A system to manage team members, positions, and statistics dynamically.
+Specifications:
+Structure: Stores team details (team name, coach, player list).
+Array: Holds the list of teams in a tournament.
+Union: Represents either team ranking or average player performance.
+Strings: Store team names and player positions.
+const Pointers: Protect team details.
+Double Pointers: Allocate team structures dynamically.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+union TeamStats {
+    int teamRanking;
+    float avgPlayerPerformance;
+};
+
+struct Player {
+    char name[50];
+    char position[50];
+    int goalsScored;
+};
+
+struct Team {
+    char teamName[50];
+    char coach[50];
+    struct Player* playerList;
+    union TeamStats stats;
+    int numPlayers;
+};
+
+void displayTeamDetails(const struct Team* team) {
+    printf("\nTeam Name: %s\n", team->teamName);
+    printf("Coach: %s\n", team->coach);
+    printf("Number of Players: %d\n", team->numPlayers);
+    printf("Team Stats: ");
+    if (team->stats.teamRanking) {
+        printf("Team Ranking: %d\n", team->stats.teamRanking);
+    } else {
+        printf("Average Player Performance: %.2f\n", team->stats.avgPlayerPerformance);
+    }
+
+    for (int i = 0; i < team->numPlayers; i++) {
+        printf("\nPlayer %d Name: %s\n", i+1, team->playerList[i].name);
+        printf("Position: %s\n", team->playerList[i].position);
+        printf("Goals Scored: %d\n", team->playerList[i].goalsScored);
+    }
+}
+
+int main() {
+    int numTeams;
+
+    printf("Enter the number of teams: ");
+    scanf("%d", &numTeams);
+    
+    struct Team* teams = (struct Team*)malloc(numTeams * sizeof(struct Team));
+    
+    for (int i = 0; i < numTeams; i++) {
+        printf("\nEnter details for Team %d:\n", i+1);
+
+        printf("Enter team name: ");
+        scanf(" %[^\n]s", teams[i].teamName);
+
+        printf("Enter coach name: ");
+        scanf(" %[^\n]s", teams[i].coach);
+
+        printf("Enter the number of players: ");
+        scanf("%d", &teams[i].numPlayers);
+
+        teams[i].playerList = (struct Player*)malloc(teams[i].numPlayers * sizeof(struct Player));
+
+        for (int j = 0; j < teams[i].numPlayers; j++) {
+            printf("\nEnter details for Player %d:\n", j+1);
+            
+            printf("Enter player name: ");
+            scanf(" %[^\n]s", teams[i].playerList[j].name);
+            
+            printf("Enter player position: ");
+            scanf(" %[^\n]s", teams[i].playerList[j].position);
+            
+            printf("Enter goals scored by the player: ");
+            scanf("%d", &teams[i].playerList[j].goalsScored);
+        }
+
+        printf("\nEnter team stats:\n");
+        printf("Enter team ranking (0 if no ranking available): ");
+        scanf("%d", &teams[i].stats.teamRanking);
+
+        if (teams[i].stats.teamRanking == 0) {
+            printf("Enter average player performance: ");
+            scanf("%f", &teams[i].stats.avgPlayerPerformance);
+        }
+    }
+
+    for (int i = 0; i < numTeams; i++) {
+        displayTeamDetails(&teams[i]);
+    }
+
+    for (int i = 0; i < numTeams; i++) {
+        free(teams[i].playerList);
+    }
+
+    free(teams);
+    
+    return 0;
+}
+
+
+ 
+3. Sports Event Registration System
+Description:
+
+Create a system for players to register for different sports events.
+Specifications:
+Structure: Holds player registration details (name, event, category).
+Array: Stores registrations for multiple events.
+Union: Represents either event type or fee details.
+Strings: Store event names.
+const Pointers: Prevent modifications to event details.
+Double Pointers: Dynamically allocate participants.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store player registration details
+typedef struct {
+    const char *name;
+    const char *event;
+    const char *category;
+} Registration;
+
+// Union to store event type or fee details
+typedef union {
+    char event_type[30];
+    float fee;
+} EventDetails;
+
+// Function to add a new registration
+typedef Registration* RegPtr;
+void addRegistration(RegPtr *registrations, int *count) {
+    *registrations = (RegPtr)realloc(*registrations, (*count + 1) * sizeof(Registration));
+    if (*registrations == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempName[50], tempEvent[50], tempCategory[50];
+    printf("Enter player name: ");
+    scanf("%s", tempName);
+    printf("Enter event name: ");
+    scanf("%s", tempEvent);
+    printf("Enter category: ");
+    scanf("%s", tempCategory);
+    
+    (*registrations)[*count].name = strdup(tempName);
+    (*registrations)[*count].event = strdup(tempEvent);
+    (*registrations)[*count].category = strdup(tempCategory);
+    (*count)++;
+}
+
+// Function to display registrations
+void displayRegistrations(const RegPtr registrations, int count) {
+    printf("\nEvent Registrations:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Name: %s, Event: %s, Category: %s\n",
+               registrations[i].name, registrations[i].event, registrations[i].category);
+    }
+}
+
+int main() {
+    RegPtr registrations = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Register Player\n2. Display Registrations\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addRegistration(&registrations, &count);
+                break;
+            case 2:
+                displayRegistrations(registrations, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)registrations[i].name);
+        free((char*)registrations[i].event);
+        free((char*)registrations[i].category);
+    }
+    free(registrations);
+    return 0;
+}
+
+
+ 
+4. Game Scoreboard Management
+Description:
+
+A scoreboard system for live tracking and updating scores during matches.
+Specifications:
+Structure: Stores match details (teams, score, time elapsed).
+Array: Holds ongoing match records.
+Union: Stores either score details or penalty information.
+Strings: Represent team names and match types.
+const Pointers: Ensure score updates are controlled.
+Double Pointers: Allocate memory dynamically for new matches.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store match details
+typedef struct {
+    const char *team1;
+    const char *team2;
+    int score1;
+    int score2;
+    int time_elapsed;
+} Match;
+
+// Union to store score or penalty details
+typedef union {
+    int score[2];
+    char penalty_info[50];
+} ScoreDetails;
+
+// Function to add a new match
+typedef Match* MatchPtr;
+void addMatch(MatchPtr *matches, int *count) {
+    *matches = (MatchPtr)realloc(*matches, (*count + 1) * sizeof(Match));
+    if (*matches == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempTeam1[50], tempTeam2[50];
+    printf("Enter Team 1 name: ");
+    scanf("%s", tempTeam1);
+    printf("Enter Team 2 name: ");
+    scanf("%s", tempTeam2);
+    
+    (*matches)[*count].team1 = strdup(tempTeam1);
+    (*matches)[*count].team2 = strdup(tempTeam2);
+    (*matches)[*count].score1 = 0;
+    (*matches)[*count].score2 = 0;
+    (*matches)[*count].time_elapsed = 0;
+    (*count)++;
+}
+
+// Function to update match score
+void updateScore(MatchPtr matches, int count) {
+    char tempTeam1[50], tempTeam2[50];
+    printf("Enter Team 1 name: ");
+    scanf("%s", tempTeam1);
+    printf("Enter Team 2 name: ");
+    scanf("%s", tempTeam2);
+    
+    for (int i = 0; i < count; i++) {
+        if (strcmp(matches[i].team1, tempTeam1) == 0 && strcmp(matches[i].team2, tempTeam2) == 0) {
+            printf("Enter new score for %s: ", matches[i].team1);
+            scanf("%d", &matches[i].score1);
+            printf("Enter new score for %s: ", matches[i].team2);
+            scanf("%d", &matches[i].score2);
+            printf("Enter time elapsed: ");
+            scanf("%d", &matches[i].time_elapsed);
+            return;
+        }
+    }
+    printf("Match not found!\n");
+}
+
+// Function to display match details
+void displayMatches(const MatchPtr matches, int count) {
+    printf("\nOngoing Matches:\n");
+    for (int i = 0; i < count; i++) {
+        printf("%s vs %s | Score: %d-%d | Time: %d min\n",
+               matches[i].team1, matches[i].team2,
+               matches[i].score1, matches[i].score2,
+               matches[i].time_elapsed);
+    }
+}
+
+int main() {
+    MatchPtr matches = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Match\n2. Update Score\n3. Display Matches\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addMatch(&matches, &count);
+                break;
+            case 2:
+                updateScore(matches, count);
+                break;
+            case 3:
+                displayMatches(matches, count);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 4);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)matches[i].team1);
+        free((char*)matches[i].team2);
+    }
+    free(matches);
+    return 0;
+}
+
+
+ 
+5. Sports Merchandise Inventory System
+Description:
+
+Manage an inventory of sports merchandise and track sales.
+Specifications:
+Structure: Represents product details (name, price, stock).
+Array: Stores inventory items.
+Union: Represents either sales data or stock details.
+Strings: Store product names.
+const Pointers: Prevent unauthorized modifications.
+Double Pointers: Manage inventory dynamically.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store product details
+typedef struct {
+    const char *name;
+    float price;
+    int stock;
+} Product;
+
+// Union to store sales data or stock details
+typedef union {
+    int items_sold;
+    int stock_remaining;
+} InventoryData;
+
+// Function to add a new product
+typedef Product* ProductPtr;
+void addProduct(ProductPtr *products, int *count) {
+    *products = (ProductPtr)realloc(*products, (*count + 1) * sizeof(Product));
+    if (*products == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempName[50];
+    printf("Enter product name: ");
+    scanf("%s", tempName);
+    
+    (*products)[*count].name = strdup(tempName);
+    printf("Enter price: ");
+    scanf("%f", &((*products)[*count].price));
+    printf("Enter stock quantity: ");
+    scanf("%d", &((*products)[*count].stock));
+    (*count)++;
+}
+
+// Function to update stock or sales
+void updateStock(ProductPtr products, int count) {
+    char tempName[50];
+    printf("Enter product name: ");
+    scanf("%s", tempName);
+    
+    for (int i = 0; i < count; i++) {
+        if (strcmp(products[i].name, tempName) == 0) {
+            int sold;
+            printf("Enter quantity sold: ");
+            scanf("%d", &sold);
+            if (sold <= products[i].stock) {
+                products[i].stock -= sold;
+                printf("Updated stock for %s: %d remaining\n", products[i].name, products[i].stock);
+            } else {
+                printf("Not enough stock available!\n");
+            }
+            return;
+        }
+    }
+    printf("Product not found!\n");
+}
+
+// Function to display inventory
+void displayInventory(const ProductPtr products, int count) {
+    printf("\nSports Merchandise Inventory:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Product: %s | Price: %.2f | Stock: %d\n",
+               products[i].name, products[i].price, products[i].stock);
+    }
+}
+
+int main() {
+    ProductPtr products = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Product\n2. Update Stock\n3. Display Inventory\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addProduct(&products, &count);
+                break;
+            case 2:
+                updateStock(products, count);
+                break;
+            case 3:
+                displayInventory(products, count);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 4);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)products[i].name);
+    }
+    free(products);
+    return 0;
+}
+
+ 
+6. Training Session Scheduler
+Description:
+
+Schedule and manage training sessions for athletes.
+Specifications:
+Structure: Stores session details (coach, players, duration).
+Array: Holds scheduled sessions.
+Union: Represents either training type or player feedback.
+Strings: Store session types.
+const Pointers: Ensure schedules remain unchanged.
+Double Pointers: Allocate training data dynamically.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store training session details
+typedef struct {
+    const char *coach;
+    const char *players;
+    int duration;
+} TrainingSession;
+
+// Union to store training type or player feedback
+typedef union {
+    char training_type[50];
+    char feedback[100];
+} TrainingData;
+
+// Function to add a new training session
+typedef TrainingSession* SessionPtr;
+void addSession(SessionPtr *sessions, int *count) {
+    *sessions = (SessionPtr)realloc(*sessions, (*count + 1) * sizeof(TrainingSession));
+    if (*sessions == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempCoach[50], tempPlayers[100];
+    printf("Enter coach name: ");
+    scanf("%s", tempCoach);
+    printf("Enter player names (comma-separated): ");
+    scanf("%s", tempPlayers);
+    
+    (*sessions)[*count].coach = strdup(tempCoach);
+    (*sessions)[*count].players = strdup(tempPlayers);
+    printf("Enter session duration (minutes): ");
+    scanf("%d", &((*sessions)[*count].duration));
+    (*count)++;
+}
+
+// Function to display training sessions
+void displaySessions(const SessionPtr sessions, int count) {
+    printf("\nScheduled Training Sessions:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Coach: %s | Players: %s | Duration: %d min\n",
+               sessions[i].coach, sessions[i].players, sessions[i].duration);
+    }
+}
+
+int main() {
+    SessionPtr sessions = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Schedule Training Session\n2. Display Sessions\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addSession(&sessions, &count);
+                break;
+            case 2:
+                displaySessions(sessions, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)sessions[i].coach);
+        free((char*)sessions[i].players);
+    }
+    free(sessions);
+    return 0;
+}
+
+
+ 
+7. Fantasy Sports League Simulator
+Description:
+
+Simulate fantasy sports leagues where users select players and track their scores.
+Specifications:
+Structure: Represents fantasy team details (player selections, total score).
+Array: Holds team selections.
+Union: Stores either player performance or team ranking.
+Strings: Represent team names.
+const Pointers: Protect fantasy team configurations.
+Double Pointers: Allocate league participants dynamically.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store fantasy team details
+typedef struct {
+    const char *team_name;
+    const char *players;
+    int total_score;
+} FantasyTeam;
+
+// Union to store player performance or team ranking
+typedef union {
+    int player_performance;
+    int team_ranking;
+} FantasyData;
+
+// Function to add a new fantasy team
+typedef FantasyTeam* TeamPtr;
+void addTeam(TeamPtr *teams, int *count) {
+    *teams = (TeamPtr)realloc(*teams, (*count + 1) * sizeof(FantasyTeam));
+    if (*teams == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempTeamName[50], tempPlayers[100];
+    printf("Enter team name: ");
+    scanf("%s", tempTeamName);
+    printf("Enter player names (comma-separated): ");
+    scanf("%s", tempPlayers);
+    
+    (*teams)[*count].team_name = strdup(tempTeamName);
+    (*teams)[*count].players = strdup(tempPlayers);
+    (*teams)[*count].total_score = 0;
+    (*count)++;
+}
+
+// Function to update team score
+void updateScore(TeamPtr teams, int count) {
+    char tempTeamName[50];
+    printf("Enter team name: ");
+    scanf("%s", tempTeamName);
+    
+    for (int i = 0; i < count; i++) {
+        if (strcmp(teams[i].team_name, tempTeamName) == 0) {
+            int score;
+            printf("Enter new total score: ");
+            scanf("%d", &score);
+            teams[i].total_score = score;
+            return;
+        }
+    }
+    printf("Team not found!\n");
+}
+
+// Function to display fantasy teams
+void displayTeams(const TeamPtr teams, int count) {
+    printf("\nFantasy League Teams:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Team: %s | Players: %s | Total Score: %d\n",
+               teams[i].team_name, teams[i].players, teams[i].total_score);
+    }
+}
+
+int main() {
+    TeamPtr teams = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Fantasy Team\n2. Update Score\n3. Display Teams\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addTeam(&teams, &count);
+                break;
+            case 2:
+                updateScore(teams, count);
+                break;
+            case 3:
+                displayTeams(teams, count);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 4);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)teams[i].team_name);
+        free((char*)teams[i].players);
+    }
+    free(teams);
+    return 0;
+}
+
+
+ 
+8. Automated Officiating System
+Description:
+
+Develop a system to automate refereeing decisions based on player actions.
+Specifications:
+Structure: Stores event details (player, action, penalty).
+Array: Holds a list of game events.
+Union: Represents either fouls or scoring data.
+Strings: Store action descriptions.
+const Pointers: Protect referee decisions.
+Double Pointers: Allocate event records dynamically.
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store event details
+typedef struct {
+    const char *player;
+    const char *action;
+    int penalty;
+} GameEvent;
+
+// Union to store fouls or scoring data
+typedef union {
+    int foul_count;
+    int score_points;
+} EventData;
+
+// Function to add a new game event
+typedef GameEvent* EventPtr;
+void addEvent(EventPtr *events, int *count) {
+    *events = (EventPtr)realloc(*events, (*count + 1) * sizeof(GameEvent));
+    if (*events == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempPlayer[50], tempAction[100];
+    printf("Enter player name: ");
+    scanf("%s", tempPlayer);
+    printf("Enter action description: ");
+    scanf("%s", tempAction);
+    
+    (*events)[*count].player = strdup(tempPlayer);
+    (*events)[*count].action = strdup(tempAction);
+    printf("Enter penalty points (if any): ");
+    scanf("%d", &((*events)[*count].penalty));
+    (*count)++;
+}
+
+// Function to display game events
+void displayEvents(const EventPtr events, int count) {
+    printf("\nGame Events:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Player: %s | Action: %s | Penalty: %d\n",
+               events[i].player, events[i].action, events[i].penalty);
+    }
+}
+
+int main() {
+    EventPtr events = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Game Event\n2. Display Events\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addEvent(&events, &count);
+                break;
+            case 2:
+                displayEvents(events, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)events[i].player);
+        free((char*)events[i].action);
+    }
+    free(events);
+    return 0;
+}
+
+
+ 
+9. Sports Injury Analysis System
+Description:
+
+Analyze injury patterns among athletes and provide preventive measures.
+Specifications:
+Structure: Stores injury details (type, severity, recovery time).
+Array: Holds data for multiple players.
+Union: Stores either injury details or rehabilitation progress.
+Strings: Store injury descriptions.
+const Pointers: Prevent modification of medical data.
+Double Pointers: Allocate injury reports dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store injury details
+typedef struct {
+    const char *injury_type;
+    const char *severity;
+    int recovery_time;
+} InjuryReport;
+
+// Union to store either injury details or rehabilitation progress
+typedef union {
+    int injury_level;
+    int rehab_progress;
+} InjuryData;
+
+// Function to add a new injury report
+typedef InjuryReport* ReportPtr;
+void addReport(ReportPtr *reports, int *count) {
+    *reports = (ReportPtr)realloc(*reports, (*count + 1) * sizeof(InjuryReport));
+    if (*reports == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempInjuryType[50], tempSeverity[20];
+    printf("Enter injury type: ");
+    scanf("%s", tempInjuryType);
+    printf("Enter severity level (mild/moderate/severe): ");
+    scanf("%s", tempSeverity);
+    
+    (*reports)[*count].injury_type = strdup(tempInjuryType);
+    (*reports)[*count].severity = strdup(tempSeverity);
+    printf("Enter estimated recovery time (days): ");
+    scanf("%d", &((*reports)[*count].recovery_time));
+    (*count)++;
+}
+
+// Function to display injury reports
+void displayReports(const ReportPtr reports, int count) {
+    printf("\nInjury Reports:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Injury Type: %s | Severity: %s | Recovery Time: %d days\n",
+               reports[i].injury_type, reports[i].severity, reports[i].recovery_time);
+    }
+}
+
+int main() {
+    ReportPtr reports = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Injury Report\n2. Display Reports\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addReport(&reports, &count);
+                break;
+            case 2:
+                displayReports(reports, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)reports[i].injury_type);
+        free((char*)reports[i].severity);
+    }
+    free(reports);
+    return 0;
+}
+
+
+ 
+10. Athlete Diet and Nutrition Planner
+Description:
+
+Develop a system for planning and tracking athlete diets.
+Specifications:
+Structure: Stores diet details (calories, protein, meal type).
+Array: Holds diet plans for multiple athletes.
+Union: Represents either calorie intake or nutrient composition.
+Strings: Store food item names.
+const Pointers: Protect dietary plans.
+Double Pointers: Manage diet records dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store diet details
+typedef struct {
+    const char *meal_type;
+    int calories;
+    int protein;
+} DietPlan;
+
+// Union to store either calorie intake or nutrient composition
+typedef union {
+    int calorie_intake;
+    int nutrient_composition;
+} DietData;
+
+// Function to add a new diet plan
+typedef DietPlan* DietPtr;
+void addDiet(DietPtr *plans, int *count) {
+    *plans = (DietPtr)realloc(*plans, (*count + 1) * sizeof(DietPlan));
+    if (*plans == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempMealType[50];
+    printf("Enter meal type (breakfast/lunch/dinner/snack): ");
+    scanf("%s", tempMealType);
+    
+    (*plans)[*count].meal_type = strdup(tempMealType);
+    printf("Enter calorie content: ");
+    scanf("%d", &((*plans)[*count].calories));
+    printf("Enter protein content (grams): ");
+    scanf("%d", &((*plans)[*count].protein));
+    (*count)++;
+}
+
+// Function to display diet plans
+void displayDiets(const DietPtr plans, int count) {
+    printf("\nDiet Plans:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Meal Type: %s | Calories: %d | Protein: %d g\n",
+               plans[i].meal_type, plans[i].calories, plans[i].protein);
+    }
+}
+
+int main() {
+    DietPtr plans = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Diet Plan\n2. Display Diet Plans\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addDiet(&plans, &count);
+                break;
+            case 2:
+                displayDiets(plans, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)plans[i].meal_type);
+    }
+    free(plans);
+    return 0;
+}
+
+ 
+11. Live Match Commentator System
+Description:
+
+Automate sports commentary based on real-time data.
+Specifications:
+Structure: Stores match details (teams, events, commentary).
+Array: Holds event logs.
+Union: Represents either goal descriptions or player actions.
+Strings: Store commentary text.
+const Pointers: Protect event logs.
+Double Pointers: Manage commentary dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store match details
+typedef struct {
+    const char *team1;
+    const char *team2;
+    const char *event;
+    const char *commentary;
+} MatchEvent;
+
+// Union to store either goal descriptions or player actions
+typedef union {
+    int goal_count;
+    char player_action[50];
+} MatchData;
+
+// Function to add a new match event
+typedef MatchEvent* EventPtr;
+void addEvent(EventPtr *events, int *count) {
+    *events = (EventPtr)realloc(*events, (*count + 1) * sizeof(MatchEvent));
+    if (*events == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempTeam1[50], tempTeam2[50], tempEvent[100], tempCommentary[200];
+    printf("Enter Team 1: ");
+    scanf("%s", tempTeam1);
+    printf("Enter Team 2: ");
+    scanf("%s", tempTeam2);
+    printf("Enter event description: ");
+    scanf("%s", tempEvent);
+    printf("Enter commentary: ");
+    scanf("%s", tempCommentary);
+    
+    (*events)[*count].team1 = strdup(tempTeam1);
+    (*events)[*count].team2 = strdup(tempTeam2);
+    (*events)[*count].event = strdup(tempEvent);
+    (*events)[*count].commentary = strdup(tempCommentary);
+    (*count)++;
+}
+
+// Function to display match events
+void displayEvents(const EventPtr events, int count) {
+    printf("\nLive Match Commentary:\n");
+    for (int i = 0; i < count; i++) {
+        printf("%s vs %s | Event: %s | Commentary: %s\n",
+               events[i].team1, events[i].team2, events[i].event, events[i].commentary);
+    }
+}
+
+int main() {
+    EventPtr events = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Match Event\n2. Display Live Commentary\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addEvent(&events, &count);
+                break;
+            case 2:
+                displayEvents(events, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)events[i].team1);
+        free((char*)events[i].team2);
+        free((char*)events[i].event);
+        free((char*)events[i].commentary);
+    }
+    free(events);
+    return 0;
+}
+
+ 
+12. Fitness Tracking System for Athletes
+Description:
+
+Monitor fitness parameters like heart rate, speed, and stamina.
+Specifications:
+Structure: Stores fitness data (heart rate, distance covered).
+Array: Holds multiple records over time.
+Union: Represents either heart rate data or speed statistics.
+Strings: Represent fitness activities.
+const Pointers: Ensure fitness data remains accurate.
+Double Pointers: Allocate fitness records dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store fitness data
+typedef struct {
+    const char *activity;
+    int heart_rate;
+    float distance_covered;
+} FitnessData;
+
+// Union to store either heart rate data or speed statistics
+typedef union {
+    int heart_rate;
+    float speed;
+} FitnessStats;
+
+// Function to add a new fitness record
+typedef FitnessData* FitnessPtr;
+void addRecord(FitnessPtr *records, int *count) {
+    *records = (FitnessPtr)realloc(*records, (*count + 1) * sizeof(FitnessData));
+    if (*records == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    
+    char tempActivity[50];
+    printf("Enter fitness activity (running/cycling/swimming): ");
+    scanf("%s", tempActivity);
+    
+    (*records)[*count].activity = strdup(tempActivity);
+    printf("Enter heart rate (bpm): ");
+    scanf("%d", &((*records)[*count].heart_rate));
+    printf("Enter distance covered (km): ");
+    scanf("%f", &((*records)[*count].distance_covered));
+    (*count)++;
+}
+
+// Function to display fitness records
+void displayRecords(const FitnessPtr records, int count) {
+    printf("\nFitness Tracking Data:\n");
+    for (int i = 0; i < count; i++) {
+        printf("Activity: %s | Heart Rate: %d bpm | Distance: %.2f km\n",
+               records[i].activity, records[i].heart_rate, records[i].distance_covered);
+    }
+}
+
+int main() {
+    FitnessPtr records = NULL;
+    int count = 0;
+    int choice;
+    
+    do {
+        printf("\n1. Add Fitness Record\n2. Display Fitness Records\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                addRecord(&records, &count);
+                break;
+            case 2:
+                displayRecords(records, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+    
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free((char*)records[i].activity);
+    }
+    free(records);
+    return 0;
+}
+
+
+ 
+13. Automated Training Performance Analyzer
+Description:
+
+Analyze training performance based on motion sensors.
+Specifications:
+Structure: Stores performance details (speed, agility, endurance).
+Array: Holds time-series performance data.
+Union: Stores either endurance level or speed records.
+Strings: Represent training routines.
+const Pointers: Protect performance data.
+Double Pointers: Manage training records dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to store training performance details
+struct Performance {
+    float speed;
+    float agility;
+    float endurance;
+};
+
+// Union to store either endurance or speed record
+union Record {
+    float endurance;
+    float speed;
+};
+
+// Function to display the performance data
+void displayPerformance(const struct Performance *perf, const char *routine, double **records, int numRecords) {
+    printf("\nTraining Routine: %s\n", routine);
+    printf("Speed: %.2f, Agility: %.2f, Endurance: %.2f\n", perf->speed, perf->agility, perf->endurance);
+    
+    // Displaying time-series performance data
+    printf("Time-series performance data: ");
+    for (int i = 0; i < numRecords; i++) {
+        printf("%.2f ", *records[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    // Define training performance data
+    struct Performance training1 = {12.5, 9.3, 75.4};
+    struct Performance training2 = {15.2, 8.8, 78.5};
+    
+    // Define training routines
+    const char *routine1 = "Routine A";
+    const char *routine2 = "Routine B";
+    
+    // Define time-series performance data using double pointers (dynamic memory)
+    int numRecords = 3;
+    double **trainingRecords = (double **)malloc(numRecords * sizeof(double *));
+    
+    if (trainingRecords == NULL) {
+        printf("Memory allocation failed!\n");
+        return 1;
+    }
+
+    for (int i = 0; i < numRecords; i++) {
+        trainingRecords[i] = (double *)malloc(sizeof(double));
+        if (trainingRecords[i] == NULL) {
+            printf("Memory allocation failed!\n");
+            return 1;
+        }
+        *trainingRecords[i] = 10.0 + i * 2;  // Example time-series data
+    }
+
+    // Display performance data for each routine
+    displayPerformance(&training1, routine1, trainingRecords, numRecords);
+    displayPerformance(&training2, routine2, trainingRecords, numRecords);
+
+    // Free dynamically allocated memory
+    for (int i = 0; i < numRecords; i++) {
+        free(trainingRecords[i]);
+    }
+    free(trainingRecords);
+
+    return 0;
+}
+
+
+ 
+14. Match Attendance and Ticketing System
+Description:
+
+Manage ticket sales and audience attendance for sports events.
+Specifications:
+Structure: Stores ticket details (seat number, price, buyer info).
+Array: Holds ticket records.
+Union: Represents either ticket sales or seat availability.
+Strings: Store attendee names.
+const Pointers: Protect sales data.
+Double Pointers: Allocate ticketing data dynamically.
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure to store ticket details
+typedef struct {
+    int seatNumber;
+    float price;
+    char *buyerName;
+} Ticket;
+
+// Union to represent either ticket sales or seat availability
+typedef union {
+    int isAvailable;  // 1 for available, 0 for sold
+    float salePrice;
+} TicketStatus;
+
+// Function to add a new ticket
+typedef Ticket* TicketPtr;
+void addTicket(TicketPtr *records, TicketStatus **status, int *count) {
+    *records = (TicketPtr)realloc(*records, (*count + 1) * sizeof(Ticket));
+    *status = (TicketStatus *)realloc(*status, (*count + 1) * sizeof(TicketStatus));
+
+    if (*records == NULL || *status == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+
+    printf("Enter seat number: ");
+    scanf("%d", &((*records)[*count].seatNumber));
+    printf("Enter ticket price: ");
+    scanf("%f", &((*records)[*count].price));
+
+    char tempName[50];
+    printf("Enter buyer name (type 'none' if available): ");
+    scanf("%s", tempName);
+
+    // Checking if the first character is 'n' (assuming user types "none")
+    if (tempName[0] == 'n') {
+        (*records)[*count].buyerName = NULL;
+        (*status)[*count].isAvailable = 1;
+    } else {
+        (*records)[*count].buyerName = (char *)malloc(50 * sizeof(char));
+        int i = 0;
+        while (tempName[i] != '\0') {  
+            (*records)[*count].buyerName[i] = tempName[i];
+            i++;
+        }
+        (*records)[*count].buyerName[i] = '\0';
+
+        (*status)[*count].salePrice = (*records)[*count].price;
+        (*status)[*count].isAvailable = 0;
+    }
+    (*count)++;
+}
+
+// Function to display ticket records
+void displayTickets(const TicketPtr records, const TicketStatus *status, int count) {
+    printf("\nTicket Records:\n");
+    printf("Seat No\tPrice\tBuyer\t\tStatus\n");
+    for (int i = 0; i < count; i++) {
+        printf("%d\t%.2f\t", records[i].seatNumber, records[i].price);
+        if (status[i].isAvailable)
+            printf("Available\n");
+        else
+            printf("%s\tSold\n", records[i].buyerName);
+    }
+}
+
+int main() {
+    TicketPtr records = NULL;
+    TicketStatus *status = NULL;
+    int count = 0, choice;
+
+    do {
+        printf("\n1. Add Ticket\n2. Display Tickets\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addTicket(&records, &status, &count);
+                break;
+            case 2:
+                displayTickets(records, status, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        if (records[i].buyerName != NULL) {
+            free(records[i].buyerName);
+        }
+    }
+    free(records);
+    free(status);
+
+    return 0;
+}
+
+
+ 
+15. Advanced Sports Analytics Dashboard
+Description:
+
+Develop a dashboard for advanced statistics on team and player performance.
+Specifications:
+Structure: Stores analytics details (player efficiency, win/loss ratio).
+Array: Holds match statistics.
+Union: Represents either player or team performance metrics.
+Strings: Store statistical report names.
+const Pointers: Prevent modification of analytics reports.
+Double Pointers: Allocate analytics data dynamically.
+ #include <stdio.h>
+#include <stdlib.h>
+
+// Structure to store analytics details
+typedef struct {
+    char *reportName;
+    float playerEfficiency;
+    float winLossRatio;
+} Analytics;
+
+// Union to store either player or team performance metrics
+typedef union {
+    float playerMetric;  // Efficiency metric
+    float teamMetric;    // Win/Loss ratio
+} PerformanceMetrics;
+
+// Function to add analytics report
+typedef Analytics* AnalyticsPtr;
+void addReport(AnalyticsPtr *reports, PerformanceMetrics **metrics, int *count) {
+    *reports = (AnalyticsPtr)realloc(*reports, (*count + 1) * sizeof(Analytics));
+    *metrics = (PerformanceMetrics *)realloc(*metrics, (*count + 1) * sizeof(PerformanceMetrics));
+
+    if (*reports == NULL || *metrics == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+
+    char tempName[50];
+    printf("Enter report name: ");
+    scanf("%s", tempName);
+
+    (*reports)[*count].reportName = (char *)malloc(50 * sizeof(char));
+    int i = 0;
+    while (tempName[i] != '\0') {
+        (*reports)[*count].reportName[i] = tempName[i];
+        i++;
+    }
+    (*reports)[*count].reportName[i] = '\0';
+
+    printf("Enter player efficiency rating: ");
+    scanf("%f", &((*reports)[*count].playerEfficiency));
+    printf("Enter win/loss ratio: ");
+    scanf("%f", &((*reports)[*count].winLossRatio));
+
+    (*metrics)[*count].playerMetric = (*reports)[*count].playerEfficiency;
+
+    (*count)++;
+}
+
+// Function to display analytics reports
+void displayReports(const AnalyticsPtr reports, const PerformanceMetrics *metrics, int count) {
+    printf("\nAnalytics Reports:\n");
+    printf("Report\t\tEfficiency\tWin/Loss\n");
+    for (int i = 0; i < count; i++) {
+        printf("%s\t\t%.2f\t\t%.2f\n", reports[i].reportName, metrics[i].playerMetric, reports[i].winLossRatio);
+    }
+}
+
+int main() {
+    AnalyticsPtr reports = NULL;
+    PerformanceMetrics *metrics = NULL;
+    int count = 0, choice;
+
+    do {
+        printf("\n1. Add Report\n2. Display Reports\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addReport(&reports, &metrics, &count);
+                break;
+            case 2:
+                displayReports(reports, metrics, count);
+                break;
+            case 3:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 3);
+
+    // Free allocated memory
+    for (int i = 0; i < count; i++) {
+        free(reports[i].reportName);
+    }
+    free(reports);
+    free(metrics);
+
+    return 0;
+}
+
+
+ 
